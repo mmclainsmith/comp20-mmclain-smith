@@ -1,0 +1,23 @@
+.k8em0 {
+        width: 600px;
+        height: 600px;
+        background: url(k8em0.jpg) 0 0;
+}
+
+@media (max-width: 1200px) {
+        .k8em0 {
+                background-position: 600px 0;
+        }
+}
+
+@media (max-width: 900px) {
+        .k8em0 {
+                background-position: 0 600px;
+        }
+}
+
+@media (max-width: 600px) {
+        .k8em0 {
+                background-position: 600px 600px;
+        }
+}
