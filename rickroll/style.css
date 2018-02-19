@@ -1,0 +1,15 @@
+body {
+        background-color: black;
+        color: white;
+        text-align: center;
+        font-family: sans-serif;
+}
+h1 {
+        text-transform: uppercase;
+        letter-spacing: 30px;
+        margin: 30px;
+}
+
+p {
+        margin:4px;
+}

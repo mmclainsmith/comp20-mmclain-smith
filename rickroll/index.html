@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <meta charset="utf-8" />
+        <title>Rick Roll</title>
+        <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+        <h1 id="title">Rick Roll</h1>
+
+        <video src="https://www.cs.tufts.edu/comp/20/rickroll.mp4" id="rickroll" controls></video>
+        <div id="lyrics"></div>
+
+        <script>
+                var video = document.getElementById("rickroll");
+                var lyrics = document.getElementById("lyrics");
+                video.addEventListener("timeupdate", function(){
+                        t = video.currentTime;
+                        if (t > 18 && t < 35){
+                                lyrics.innerHTML = `<p>We're no strangers to love</p>
+                                        <p>You know the rules and so do I</p>
+                                        <p>A full commitment's what I'm thinking of</p>
+                                        <p>You wouldn't get this from any other guy</p>`;
+                        } else if (t > 35 && t < 42) {
+                                lyrics.innerHTML = `<p>I just wanna tell you how I'm feeling</p>
+                                                <p>Gotta make you understand</p>`;
+                        } else if (t > 42 && t < 59) {
+                                lyrics.innerHTML = `<p>Never gonna give you up</p>
+                                        <p>Never gonna let you down</p>
+                                        <p>Never gonna run around and desert you</p>
+                                        <p>Never gonna make you cry</p>
+                                        <p>Never gonna say goodbye</p>
+                                        <p>Never gonna tell a lie and hurt you</p>`;
+                        } else if (t > 59 && t < 78) {
+                                lyrics.innerHTML = `<p>We've known each other for so long</p>
+                                        <p>Your heart's been aching, but</p>
+                                        <p>You're too shy to say it</p>
+                                        <p>Inside, we both know what's been going on</p>
+                                        <p>We know the game and we're gonna play it</p>`;
+                        } else if (t > 78 && t < 85) {
+                                lyrics.innerHTML = `<p>And if you ask me how I'm feeling</p>
+                                        <p>Don't tell me you're too blind to see</p>`;
+                        } else if (t > 85 && t < 120) {
+                                lyrics.innerHTML = `<p>Never gonna give you up</p>
+                                        <p>Never gonna let you down</p>
+                                        <p>Never gonna run around and desert you</p>
+                                        <p>Never gonna make you cry</p>
+                                        <p>Never gonna say goodbye</p>
+                                        <p>Never gonna tell a lie and hurt you</p>`;
+                        } else if (t > 120 && t < 136){
+                                lyrics.innerHTML = `<p>(Ooh, give you up)</p>
+                                        <p>(Ooh, give you up)</p>
+                                        <p>Never gonna give, never gonna give</p>
+                                        <p>(Give you up)</p>
+                                        <p>Never gonna give, never gonna give</p>
+                                        <p>(Give you up)</p>`;
+                        } else if (t > 136 && t < 152){
+                                lyrics.innerHTML = `<p>We've known each other for so long</p>
+                                        <p>Your heart's been aching, but</p>
+                                        <p>You're too shy to say it</p>
+                                        <p>Inside, we both know what's been going on</p>
+                                        <p>We know the game and we're gonna play it</p>`;
+                        } else if (t > 152 && t < 160) {
+                                lyrics.innerHTML = `<p>I just wanna tell you how I'm feeling</p>
+                                        <p>Gotta make you understand</p>`;
+                        } else if (t > 160) {
+                                lyrics.innerHTML = `<p> Never gonna give you up</p>
+                                        <p>Never gonna let you down</p>
+                                        <p>Never gonna run around and desert you</p>
+                                        <p>Never gonna make you cry</p>
+                                        <p>Never gonna say goodbye</p>
+                                        <p>Never gonna tell a lie and hurt you</p>`
+                        }
+                });
+        </script>
+</body>
+</html>
