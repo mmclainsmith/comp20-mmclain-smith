@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Google Maps API version 3 Example</title>
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<script src="https://maps.google.com/maps/api/js?libraries=geometry&sensor=true"></script>
+	<link rel="stylesheet" href="style.css" />
+	<script>
+	var MAP;
+	var USER = "iIBhYk8uDm";
+	var CURRENT;
+	var INFO;
+	var CAR = "car.png";
+	var TESTP = '{"passengers":[{"_id":"589bd3258451126182dfbc63","username":"dwR3TbOH","lat":42.3599611,"lng":-71.0567528,"created_at":"2017-02-09T02:25:41.166Z"}]}';
+	var TESTV = '{"vehicles":[{"_id":"589bd30f8451126182dfbc62","username":"uOWuyLrd","lat":42.3599611,"lng":-71.0567528,"created_at":"2017-02-09T02:25:19.575Z"}]}';
+	var DISTANCES = {};
+	var MARKERS = {};
+	var M_TO_ML = 0.000621371;
+
+	function renderMap(location) {
+		var CURRENT = location.coords;
+		var gCoords = new google.maps.LatLng(CURRENT.latitude, CURRENT.longitude);
+		var options = {
+			zoom: 13,
+			center: gCoords,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		}
+
+		MAP = new google.maps.Map(document.getElementById("map_canvas"), options);
+		INFO = new google.maps.InfoWindow();
+		var marker = new google.maps.Marker({
+			position: gCoords,
+			map: MAP,
+			animation: google.maps.Animation.DROP,
+			icon: {
+				path: google.maps.SymbolPath.CIRCLE,
+				scale: 10
+			},
+		});
+
+		var min = "Nearest cannot be calculated";
+		var xhr = new XMLHttpRequest();
+		var url = "https://jordan-marsh.herokuapp.com/rides";
+		var params = "username="+ USER + "&lat=" + CURRENT.latitude + "&lng=" + CURRENT.longitude;
+		xhr.open("POST", url, true);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.onload = function() {
+			loadData(TESTV);//xhr.response);
+			calculateDistances(gCoords);
+			addListeners();
+			min = findMin();
+		}
+		xhr.send(params);
+
+		google.maps.event.addListener(marker, 'click', function() {
+			INFO.setContent(USER);
+			INFO.open(MAP, marker);
+			INFO.setContent('<h3>' + USER + '</h3>' +
+					'<h4> Nearest: </h4>' +
+					min);
+		});
+	}
+
+	function loadData(data) {
+		var json = JSON.parse(data);
+		if ("vehicles" in json) {
+			loadCars(json.vehicles);
+		} else if ("passengers" in json) {
+			loadPassengers(json.passengers);
+		} else {
+			alert("Something went wrong!");
+		}
+	}
+
+	function loadCars(cars) {
+		for (i in cars) {
+			var username = cars[i].username;
+			MARKERS[username] = new google.maps.Marker({
+				position: {lat: cars[i].lat, lng: cars[i].lng},
+				map: MAP,
+				icon: CAR,
+				title: username,
+			});
+		}
+	}
+
+	function calculateDistances(gCoords){
+		for (user in MARKERS) {
+			DISTANCES[user] = M_TO_ML * google.maps.geometry.spherical.computeDistanceBetween(gCoords, MARKERS[user].position);
+		}
+	}
+
+	function findMin(){
+		var min_id;
+		var min_dist = Number.MAX_SAFE_INTEGER;
+		for (id in DISTANCES){
+			if (DISTANCES[id] < min_dist) {
+				min_id = id;
+				min_dist = DISTANCES[id];
+			}
+		}
+
+		return "<p> ID: " + min_id + "</p> <p> Distance: " + min_dist.toFixed(5) + "</p>";
+	}
+
+	function loadPassengers(passengers) {
+		for (i in passengers) {
+			var username = passengers[i].username;
+			MARKERS[username] = new google.maps.Marker({
+				animation: google.maps.Animation.DROP,
+				position: {lat: passengers[i].lat, lng: passengers[i].lng},
+				map: MAP,
+				icon: {
+					path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+					scale: 5,
+					strokeColor: 'red',
+					title: username
+				},
+			});
+		}
+	}
+
+	function addListeners(){
+		for (username in MARKERS){
+			google.maps.event.addListener(MARKERS[username], 'click', function() {
+				INFO.setContent('<h3>' + username + '</h3>' +
+						'<p> Distance: ' + DISTANCES[username].toFixed(5) + '</p>');
+				INFO.open(MAP, MARKERS[username]);
+			});
+		}
+	}
+
+	function init()
+	{
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(renderMap);
+		}
+	}
+
+	</script>
+</head>
+
+<body onload="init()">
+	<div id="map_canvas"></div>
+</body>
+</html>
