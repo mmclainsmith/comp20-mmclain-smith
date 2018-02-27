@@ -47,7 +47,7 @@
 		xhr.open("POST", url, true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xhr.onload = function() {
-			loadData(TESTV);//xhr.response);
+			loadData(xhr.response);//xhr.response);
 			calculateDistances(gCoords);
 			addListeners();
 			min = findMin();
@@ -94,6 +94,7 @@
 
 	function findMin(){
 		var min_id;
+		var str = "Nothing within range"
 		var min_dist = Number.MAX_SAFE_INTEGER;
 		for (id in DISTANCES){
 			if (DISTANCES[id] < min_dist) {
@@ -101,8 +102,10 @@
 				min_dist = DISTANCES[id];
 			}
 		}
-
-		return "<p> ID: " + min_id + "</p> <p> Distance: " + min_dist.toFixed(5) + "</p>";
+		if (min_dist < Number.MAX_SAFE_INTEGER) {
+			str = "<p> ID: " + min_id + "</p> <p> Distance: " + min_dist.toFixed(5) + "</p>"
+		}
+		return str;
 	}
 
 	function loadPassengers(passengers) {
