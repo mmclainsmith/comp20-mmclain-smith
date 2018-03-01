@@ -19,7 +19,6 @@
 
 	function renderMap(location) {
 		var CURRENT = location.coords;
-		CURRENT = {"latitude": 25.0, "longitude": 4.6};
 		var gCoords = new google.maps.LatLng(CURRENT.latitude, CURRENT.longitude);
 		var options = {
 			zoom: 13,
@@ -42,7 +41,7 @@
 		var min = "Nearest cannot be calculated";
 		var xhr = new XMLHttpRequest();
 		var url = "https://jordan-marsh.herokuapp.com/rides";
-		var params = "username="+ "JANET"+ "&lat=" + CURRENT.latitude + "&lng=" + CURRENT.longitude;
+		var params = "username="+ USER + "&lat=" + CURRENT.latitude + "&lng=" + CURRENT.longitude;
 		xhr.open("POST", url, true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xhr.onload = function() {
