@@ -13,14 +13,13 @@
 	var CURRENT;
 	var INFO;
 	var CAR = "car.png";
-	var TESTP = '{"passengers":[{"_id":"589bd3258451126182dfbc63","username":"dwR3TbOH","lat":42.3599611,"lng":-71.0567528,"created_at":"2017-02-09T02:25:41.166Z"}]}';
-	var TESTV = '{"vehicles":[{"_id":"589bd30f8451126182dfbc62","username":"uOWuyLrd","lat":42.3599611,"lng":-71.0567528,"created_at":"2017-02-09T02:25:19.575Z"}]}';
 	var DISTANCES = {};
 	var MARKERS = {};
 	var M_TO_ML = 0.000621371;
 
 	function renderMap(location) {
 		var CURRENT = location.coords;
+		CURRENT = {"latitude": 25.0, "longitude": 4.6};
 		var gCoords = new google.maps.LatLng(CURRENT.latitude, CURRENT.longitude);
 		var options = {
 			zoom: 13,
@@ -43,7 +42,7 @@
 		var min = "Nearest cannot be calculated";
 		var xhr = new XMLHttpRequest();
 		var url = "https://jordan-marsh.herokuapp.com/rides";
-		var params = "username="+ USER + "&lat=" + CURRENT.latitude + "&lng=" + CURRENT.longitude;
+		var params = "username="+ "JANET"+ "&lat=" + CURRENT.latitude + "&lng=" + CURRENT.longitude;
 		xhr.open("POST", url, true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xhr.onload = function() {
@@ -86,6 +85,24 @@
 		}
 	}
 
+	function loadPassengers(passengers) {
+		for (i in passengers) {
+			var username = passengers[i].username;
+			MARKERS[username] = new google.maps.Marker({
+				title: username,
+				animation: google.maps.Animation.DROP,
+				position: {lat: passengers[i].lat, lng: passengers[i].lng},
+				map: MAP,
+				icon: {
+					path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
+					scale: 5,
+					strokeColor: 'red',
+					title: username
+				},
+			});
+		}
+	}
+
 	function calculateDistances(gCoords){
 		for (user in MARKERS) {
 			DISTANCES[user] = M_TO_ML * google.maps.geometry.spherical.computeDistanceBetween(gCoords, MARKERS[user].position);
@@ -108,29 +125,12 @@
 		return str;
 	}
 
-	function loadPassengers(passengers) {
-		for (i in passengers) {
-			var username = passengers[i].username;
-			MARKERS[username] = new google.maps.Marker({
-				animation: google.maps.Animation.DROP,
-				position: {lat: passengers[i].lat, lng: passengers[i].lng},
-				map: MAP,
-				icon: {
-					path: google.maps.SymbolPath.BACKWARD_CLOSED_ARROW,
-					scale: 5,
-					strokeColor: 'red',
-					title: username
-				},
-			});
-		}
-	}
-
 	function addListeners(){
 		for (username in MARKERS){
 			google.maps.event.addListener(MARKERS[username], 'click', function() {
-				INFO.setContent('<h3>' + username + '</h3>' +
-						'<p> Distance: ' + DISTANCES[username].toFixed(5) + '</p>');
-				INFO.open(MAP, MARKERS[username]);
+				INFO.setContent('<h3>' + this.title+ '</h3>' +
+						'<p> Distance: ' + DISTANCES[this.title].toFixed(5) + '</p>');
+				INFO.open(MAP, this);
 			});
 		}
 	}
