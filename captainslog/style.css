@@ -1,0 +1,16 @@
+body{
+    background-color: black;
+    color: green;
+
+    font-family: monospace;
+}
+
+h1, h3 {
+    font-size: 150%;
+    font-weight:lighter;
+}
+
+.entry {
+    color: green;
+    margin: .5em;
+}
