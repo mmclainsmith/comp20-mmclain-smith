@@ -5,4 +5,4 @@ is slightly different than the example but still human readable.
 
 Collaboration: Didn't talk with anyone, just referenced documentation and stackOverflow.
 
-Time: ~1hr
+Time: ~1.5 hr

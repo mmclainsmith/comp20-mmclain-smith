@@ -9,18 +9,29 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
     $(document).ready(function(){
-        for (var i = 0; i < localStorage.length; i++) {
-            $("#log").prepend(`<div class="entry">${localStorage.getItem(i)}</div>`);
+
+        function displayEntry(time) {
+            var date = new Date(parseInt(time));
+            var timeStamp = `${date.toDateString()} ${date.toLocaleTimeString()}`;
+            var log = localStorage.getItem(time);
+            var entryString = `${timeStamp} - ${log}`;
+            $("#log").prepend(`<div class="entry">${entryString}</div>`);
         }
 
         $("#msg").change(function(){
             var now = new Date();
-            var time = `${now.toDateString()} ${now.toLocaleTimeString()}`;
-            var logContents = `${time} - ${this.value}`
-            $("#log").prepend(`<div class="entry">${logContents}</div>`);
-            localStorage.setItem(localStorage.length, logContents);
+            var time = now.getTime();
+            console.log( time + this.value);
+            localStorage.setItem(time, this.value);
+            displayEntry(time);
             this.value = '';
         });
+
+        var times = Object.keys(localStorage).sort();
+        $.each(times, function(index, time){
+            displayEntry(time);
+        });
+
     });
     </script>
 </head>
