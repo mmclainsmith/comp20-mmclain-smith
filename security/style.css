@@ -1,0 +1,37 @@
+span::after {
+    display: inline-block;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: normal;
+}
+.low::after {
+    content: "low";
+    background-color: gold;
+}
+
+.med::after {
+    content: "medium";
+    background-color: orange;
+}
+
+.high::after {
+    content: "high";
+    background-color: red;
+}
+
+td {
+    padding: 8px;
+}
+
+td:first-child {
+    font-weight: bold;
+    display: block;
+}
+
+p {
+    margin-top: 0;
+}
+
+img {
+    max-width: 900px;
+}

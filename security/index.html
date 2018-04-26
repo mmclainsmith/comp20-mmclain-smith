@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Assignment 4</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <h1> Assignment 4: Security and Privacy Assessment </h1>
+
+    <h2> Introduction </h2>
+    <p> I was hired to find security vulnerabilities on Ming Chow's NotUber app. This application allows riders and a select group of vehicles to set their location and see other active vehicles and riders respectively.</p>
+    <h2>Methodology </h2>
+    <p> To test this site, I first employed "black box" testing by looking at the app without viewing the source code. After identifying several potential problems I examined the code for other issues.
+    </p>
+    <p>
+    I used curl and Chrome during my testing of this app.
+    </p>
+
+    <h2>Abstract of Findings</h2>
+        <ol>
+            <li>
+                <h3> No user validation </h3>
+                <p> Users do not need to validate their identies in order to send location updates. A malicious user could send a request with someone else's ID, resulting in fraud. The service could also easily be broken by going through all current IDs and setting all rider/vehicle locations to some arbitrary location like the middle of the pacific ocean.</p>
+            </li>
+            <li>
+                <h3> User tracking </h3>
+                <p> All riders latest check in locations are publically avaliable on the front page. This opens clients up to being tracked by third parties through this data. A passenger could also record IDs of vehicles and track them by requests to the /vehicle.json page.</p>
+            </li>
+            <li>
+                <h3> Code injection via username </h3>
+                <p> Since there are no limits on user names or validation, a malicious "rider" could use a piece of code as their username. When the company home page is displayed, their username will be put onto the page and the injected code will be run whenever anyone else opens the page.</p>
+            </li>
+            <li>
+                <h3> Accessing vehicle information without ID </h3>
+                <p> Because of the way the /vehicle.json&username=(username) route reads in the given username, a malicious user could write code allowing them to get the ID and data from a user whose ID they do not currently have.</p>
+            </li>
+        </ol>
+
+    <h2>Issues Found</h2>
+    <ol>
+        <li>
+            <h3> No user validation <span class="high"></span></h3>
+            <table>
+                <tr>
+                    <td>
+                        Issue:
+                    </td>
+                    <td>
+                        Bad practice
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Location:
+                    </td>
+                    <td>
+                        Vulnerability at /rides, symptoms elsewhere
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Description:
+                    </td>
+                    <td>
+                        <p>
+                            All that is required to change the location of a rider or vehicle is their ID.
+                        </p>
+                        <figcaption> Proof: Example of logging onto multiple accounts, types of account, based on taking IDs from rides requests</figcaption>
+                        <img src="imgs/switchingAcc.png">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Severity:
+                    </td>
+                    <td>
+                        There is no way to ensure that a "rider" is real and not spam, or that anyone is in the location the app puts them at. Anyone can edit anyone's location. This issue makes the app basically non-functional.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Solution:
+                    </td>
+                    <td>
+                        Require some sort of registration to make a new rider - this will reduce the ease of creating spam accounts. Require correct credentials to be sent in order to change location (ex rider must be logged in with password).
+                    </td>
+                </tr>
+            </table>
+        </li>
+        <li>
+            <h3> User tracking <span class="high"></span> </h3>
+            <table>
+                <tr>
+                    <td>
+                        Issue:
+                    </td>
+                    <td>
+                        Bad practice
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Location:
+                    </td>
+                    <td>
+                        Vulnerability at /rides, symptoms elsewhere
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Description:
+                    </td>
+                    <td>
+                        <p>
+                            A third party can view all riders most recent location on the main page.
+                        </p>
+                        <p>
+                            Proof: see main page.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Severity:
+                    </td>
+                    <td>
+                        Everyone has access to user location. This is a major breach of client trust.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Solution:
+                    </td>
+                    <td>
+                        Require credentials to access data. Only allow riders and users access data they absolutely need. There is no reason to know everyone who updated in the last 5 minutes and their locations. You could strip the data of identifying information to prevent tracking but that still potentially leaves you with a Strava style issue.
+                    </td>
+                </tr>
+            </table>
+        </li>
+        <li>
+            <h3>Code injection via username <span class="high"></span></h3>
+            <table>
+                <tr>
+                    <td>
+                        Issue:
+                    </td>
+                    <td>
+                        Cross Site Script
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Location:
+                    </td>
+                    <td>
+                        Vulnerability at /rides, symptoms elsewhere
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Description:
+                    </td>
+                    <td>
+                        <p> There are no limits on acceptable usernames so code can be inserted via the username parameter in the rides query. This code is executed when the main page is loaded.</p>
+
+                        <figcaption>Proof: Injected code to cause as alert via username in /rides, and the resulting alert. </figcaption>
+                        <img src="imgs/injectedCurl.png">
+                        <img src="imgs/injectedPopup.png">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Severity:
+                    </td>
+                    <td>
+                        Inserted code could do any number of things without the company's or user's knowledge like redirect the page, break functionality, insert content etc.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Solution:
+                    </td>
+                    <td>
+                        Sanitize usernames before inserting them into the database by removing non-alphanumeric characters. Require signup and prevent creation of accounts with invalid usernames.
+                    </td>
+                </tr>
+            </table>
+        </li>
+        <li>
+            <h3> Accessing vehicle information without ID <span class="low"></span></h3>
+            <table>
+                <tr>
+                    <td>
+                        Issue:
+                    </td>
+                    <td>
+                        Database injection
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Location:
+                    </td>
+                    <td>
+                        /vehicle.json
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Description:
+                    </td>
+                    <td>
+                        <p> By taking advantage of the MongoDB comparison query operators ($gt, $ls, $nin, etc.) you can access the data for a ride without its ID.
+                        </p>
+                        <p> Intended use:
+                            </br>
+                            <code>
+                                /vehicle.json?username=JANET
+                                &#x2192;
+                                {username : "JANET"}
+                            </code>
+                            </br>
+                            Result: return JANET data
+                        </p>
+                        <p> Vulnerability:
+                            </br>
+                            Build a JSON object as the username query value.
+                            </br>
+                            <code>
+                                /vehicle.json?username[$ne]=JANET
+                                &#x2192;
+                                {username : {"$ne" : "JANET"}}
+                            </code>
+                            </br>
+                            Result: return data for some vehicle other than JANET.
+                        </p>
+                        <p> I had my suspicions that this would be a vulnerability while "black box" testing, but due to my lack of experience with injections I only got it to work once I looked at the source code. </p>
+                        <figcaption>Proof: An example where an ID for an unknown vehicle is returned by specifying two known IDs it should not be equal to.</figcaption>
+                        <img src="imgs/noIDVehicleAccess.png">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Severity:
+                    </td>
+                    <td>
+                        <p>
+                            While is issue does reveal personal information, it is no more than is avaliable than through /rides . The only difference here is that logs will be returned for requests older than 5 minutes, and only one at a time . The need to write differnt queries to return differnt IDs, the fact that only one profile is returned at a time, and that the data is more or less avaliable elsewhere makes this a low priorty issue.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Solution:
+                    </td>
+                    <td>
+                        <p>
+                            Check if requested username is actually an object and return the empty object.
+                        </p>
+                        Line 70:<code> if (usernameEntry == undefined || usernameEntry == null || typeof usernameEntry == "object") { ... }</code>
+                    </td>
+                </tr>
+            </table>
+        </li>
+    </ol>
+    <h2>Conclusion</h2>
+    <p> As it stands, the provided NotUber app is hugely vulnerable to security threats to the point of being non-functional. Some form of user validation would need to be implemented for this app to have any hope of continuing.
+    </p>
+    <p>
+        Further study could also investigate the potential to fill the database to the capacity allowed by the free tier. 
+    </p>
+
+    <h2>References</h2>
+        <ul>
+            <li>
+                The material from class
+            </li>
+            <li>
+                The <a href="https://docs.mongodb.com">MongoDB documentation </a>
+            </li>
+            <li>
+                Your talk on <a href="https://www.youtube.com/watch?v=lcO1BTNh8r8"> Abusing NoSQL databses </a>
+            </li>
+            <li>
+                An article on <a href="http://technotip.com/4101/string-comparison-mongodb/">string comparisons in MongoDB</a>
+            </li>
+            <li>
+                The class <a href="https://piazza.com/class/jby7ch9rnsb45o">Piazza</a>
+            </li>
+        </ul>
+</body>
